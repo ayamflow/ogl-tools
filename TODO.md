@@ -7,5 +7,5 @@ mouse velocity
 postprocess
 render pass
 fbo
-get texture
+get texture/get geom
 shader
