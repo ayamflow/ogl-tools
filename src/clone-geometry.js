@@ -1,4 +1,4 @@
-import {Geometry} from 'ogl'
+import { Geometry } from 'ogl'
 
 export default function cloneGeometry(geometry) {
     let attributes = geometry.attributes

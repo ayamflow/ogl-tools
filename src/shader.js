@@ -8,7 +8,7 @@ const THREE = {} // DEBUG
 // if (!sniffer.isDesktop || process.env.ENV != 'dev') GUI.disable()
 // GUI.disable()
 
-export default class Shader extends THREE.ShaderMaterial {
+export class Shader extends THREE.ShaderMaterial {
     constructor(options = {}) {
         let useGUI = options.useGUI
         delete options.useGUI

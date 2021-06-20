@@ -1,10 +1,10 @@
-import Ticker from './ticker'
+import { ticker } from './ticker'
 import touches from 'touches'
 import sniffer from 'sniffer'
-const Emitter = require('tiny-emitter')
+import Emitter from 'tiny-emitter'
 const touch = touches(window, {filtered: true, preventSimulated: false})
 
-export default class Interaction extends Emitter {
+export class Interaction extends Emitter {
     constructor() {
         super()
         this.items = []
@@ -24,7 +24,7 @@ export default class Interaction extends Emitter {
 
         // For hover monitoring
         this.update = this.update.bind(this)
-        Ticker.add(this.update)
+        ticker.add(this.update)
     }
 
     onClick(event) {

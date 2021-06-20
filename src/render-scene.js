@@ -1,22 +1,21 @@
-import stage from './stage'
 import { Transform, RenderTarget } from 'ogl'
 import size from 'size'
 
-export default class RenderScene extends Transform {
-    constructor(options = {}) {
+export class RenderScene extends Transform {
+    constructor(gl, options = {}) {
         super()
+        this.gl = gl
         this.options = options
 
         if (!options.renderToScreen) {
             this.initRT()
         }
 
-        this.camera = options.camera || stage.camera
-        this.pixelRatio = stage.pixelRatio
+        this.camera = options.camera// || stage.camera
+        this.pixelRatio = options.pixelRatio //stage.pixelRatio
 
-        this.onResize = this.onResize.bind(this)
-        size.addListener(this.onResize)
-        this.onResize(size.width, size.height)
+        // this.onResize = this.onResize.bind(this)
+        // size.addListener(this.onResize)
     }
 
     onResize(width, height) {
@@ -29,12 +28,12 @@ export default class RenderScene extends Transform {
     }
 
     initRT(width, height) {
-        this.rt = createRT(stage.gl, width * this.pixelRatio, height * this.pixelRatio, this.options)
+        this.rt = createRT(this.gl, width * this.pixelRatio, height * this.pixelRatio, this.options)
     }
 
     render(rt) {
         if (this.options.clearColor) {
-            stage.gl.clearColor(
+            this.gl.clearColor(
                 this.options.clearColor.r,
                 this.options.clearColor.g,
                 this.options.clearColor.b,
@@ -42,7 +41,7 @@ export default class RenderScene extends Transform {
             )
         }
 
-        stage.renderer.render({
+        this.gl.renderer.render({
             scene: this.scene,
             camera: this.camera,
             target: rt || this.rt,
@@ -57,10 +56,10 @@ export default class RenderScene extends Transform {
         return this.rt.depthTexture
     }
 
-    debug() {
-        if (!this.rt) return
-        stage.addDebug(this.rt.texture)
-    }
+    // debug() {
+    //     if (!this.rt) return
+    //     stage.addDebug(this.rt.texture)
+    // }
 }
 
 function createRT(gl, width, height, options = {}) {

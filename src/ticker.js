@@ -39,4 +39,4 @@ class Ticker {
     }
 }
 
-export default new Ticker()
+export const ticker = new Ticker()

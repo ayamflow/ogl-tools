@@ -1,7 +1,7 @@
 import size from 'size'
 import touches from 'touches'
 // import Velocity from 'lib/velocity-tracker'
-import Ticker from './ticker'
+import { ticker } from './ticker'
 import {Vec2, Vec3} from 'ogl'
 const touch = touches(window, {filtered: true, preventSimulated: false})
 // const velocity = new Velocity()
@@ -32,7 +32,7 @@ class Mouse {
         touch.on('start', this.onStart)
         touch.on('move', this.onMove)
         touch.on('end', this.onEnd)
-        Ticker.add(this.onUpdate)
+        ticker.add(this.onUpdate)
         // velocity.start()
     }
     
@@ -40,7 +40,7 @@ class Mouse {
         touch.off('start', this.onStart)
         touch.off('move', this.onMove)
         touch.off('end', this.onEnd)
-        Ticker.remove(this.onUpdate)
+        ticker.remove(this.onUpdate)
         // velocity.stop()
     }
 
@@ -84,4 +84,4 @@ class Mouse {
     // }
 }
 
-export default new Mouse()
+export const mouse = new Mouse()

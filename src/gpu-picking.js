@@ -1,7 +1,5 @@
-import {Color} from 'ogl'
-import sniffer from 'sniffer'
-import Mouse from './mouse'
-import stage from './stage'
+import { Mouse } from './mouse'
+import { stage } from './stage'
 import size from 'size'
 
 const pixel = new Uint8Array(1 * 1 * 4)

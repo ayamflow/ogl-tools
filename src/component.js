@@ -11,7 +11,7 @@ export class Component extends Emitter {
     constructor() {
         super()
         this.onResize = this.onResize.bind(this)
-        size.addListener(this.onResize)
+        size.addListener(this.onResize)   
     }
 
     onResize(width, height) {}

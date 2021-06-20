@@ -3,15 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
+  "scripts": {},
+  "author": "Florian Morel",
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "ogl": "0.0.73",
     "size": "github:ayamflow/size",
-    "sniffer": "git+https://github.com/ayamflow/ogl-tools.git",
+    "sniffer": "github:ayamflow/sniffer",
+    "three": "^0.123.0",
     "tiny-emitter": "^2.1.0",
     "touches": "^1.2.2"
   }

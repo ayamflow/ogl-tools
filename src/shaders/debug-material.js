@@ -1,6 +1,6 @@
-import {Program} from 'ogl'
+import { Program } from 'ogl'
 
-export default class DebugMaterial extends Program {
+export class DebugMaterial extends Program {
     constructor(gl, options) {
         super(
             gl,

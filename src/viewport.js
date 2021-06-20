@@ -1,6 +1,6 @@
 import size from 'size'
-import stage from './stage'
-import {Vec3} from 'ogl'
+import { stage } from './stage'
+import { Vec3 } from 'ogl'
 
 // https://discourse.threejs.org/t/functions-to-calculate-the-visible-width-height-at-a-given-z-depth-from-a-perspective-camera/269
 function height(depth, camera) {

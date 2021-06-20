@@ -1,4 +1,4 @@
-import {Geometry} from 'ogl'
+import { Geometry } from 'ogl'
 import cloneGeometry from './clone-geometry'
 
 export default function mergeGeometry(geometry1, geometry2) {

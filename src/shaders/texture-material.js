@@ -1,6 +1,6 @@
-import {Program} from 'ogl'
+import { Program } from 'ogl'
 
-export default class TextureMaterial extends Program {
+export class TextureMaterial extends Program {
     constructor(gl, options) {
         super(
             gl,

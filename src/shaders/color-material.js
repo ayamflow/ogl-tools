@@ -1,6 +1,6 @@
-import {Program, Color} from 'ogl'
+import { Program, Color } from 'ogl'
 
-export default class ColorMaterial extends Program {
+export class ColorMaterial extends Program {
     constructor(gl, options) {
         super(
             gl,

@@ -1,13 +1,12 @@
 import size from 'size'
-import Mouse from './mouse'
-import Uniforms from './uniforms'
-import Interaction from './interaction'
-import Screen from './screen'
+import { mouse } from './mouse'
+import { uniforms } from './uniforms'
+import { Interaction } from './interaction'
 import { Component } from './component'
-import TextureMaterial from './shaders/texture-material'
-import {Renderer, Camera, Transform, Mesh, Color, Raycast, Plane, Orbit} from 'ogl'
-import Ticker from './ticker'
-import { RenderScene } from '../^untitled:Untitled-2'
+import { TextureMaterial } from './shaders/texture-material'
+import { Renderer, Camera, Transform, Mesh, Color, Raycast, Plane, Orbit } from 'ogl'
+import { ticker } from './ticker'
+import { RenderScene } from './render-scene'
 
 class Stage extends Component {
     constructor() {
@@ -22,7 +21,6 @@ class Stage extends Component {
             left: 0,
             width: '100%',
             height: '100%',
-            zIndex: 5,
         })
         this.resizeTarget = options.resizeTarget || null
         this.pixelRatio = options.pixelRatio || window.devicePixelRatio || 1
@@ -40,7 +38,6 @@ class Stage extends Component {
                 options
             )
         )
-        this.renderer.setSize(size.width, size.height)
 
         const gl = this.renderer.gl
         this.gl = gl
@@ -64,15 +61,14 @@ class Stage extends Component {
             far: 1000,
         })
         this.camera.position.z = 5
-        this.scene = new RenderScene({ renderToScreen: true })
+        this.scene = new RenderScene(this.gl, { renderToScreen: true })
 
         this.clearColor = new Color(options.clearColor || '#000000')
 
         // init interaction
 
-        Mouse.setCamera(this.camera)
-        Mouse.bind()
-        Uniforms.init()
+        mouse.setCamera(this.camera)
+        mouse.bind()
 
         this.controls = new Orbit(this.camera, { enabled: false })
         this.raycaster = new Raycast(gl)
@@ -93,11 +89,11 @@ class Stage extends Component {
     }
 
     start() {
-        Ticker.add(this.onUpdate)        
+        ticker.add(this.onUpdate)        
     }
 
     stop() {
-        Ticker.remove(this.onUpdate)
+        ticker.remove(this.onUpdate)
     }
 
     onUpdate() {
@@ -107,6 +103,8 @@ class Stage extends Component {
         this.emit('tick', dt)
         this.render()
         this.time = time
+
+        uniforms.update(dt)
     }
 
     toggleControls(state) {
@@ -116,7 +114,7 @@ class Stage extends Component {
     render() {
         if (this.controls.enabled) this.controls.update()
         
-        this.renderer.render({scene: this, camera: this.camera})
+        this.renderer.render({scene: this.scene, camera: this.camera})
         this.renderOrtho()
     }
 
@@ -129,6 +127,8 @@ class Stage extends Component {
     }
 
     onResize() {
+        if (!this.renderer) return
+
         let resolution = size
         if (this.resizeTarget) {
             let box = this.resizeTarget.getBoundingClientRect()
@@ -149,6 +149,8 @@ class Stage extends Component {
         this.camera.aspect = resolution.width / resolution.height
         this.camera.perspective()
 
+        uniforms.resize(resolution.width, resolution.height, this.pixelRatio)
+
         if (this.debugs) {
             this.debugs.forEach(function(mesh, i) {
                 mesh.position.x = -resolution.width * 0.5 + 50 + 100 * i
@@ -162,7 +164,7 @@ class Stage extends Component {
     }
 
     raycast(camera, objects) {
-        this.raycaster.castMouse(camera, Mouse.screenPosition)
+        this.raycaster.castMouse(camera, mouse.screenPosition)
         return this.raycaster.intersectBounds(objects)
     }
 

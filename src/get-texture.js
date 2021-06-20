@@ -6,7 +6,7 @@ export const textureCache = {}
 const pixel = new Image()
 pixel.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs='
 
-export default function(image, params = {}) {
+export function getTexture(image, params = {}) {
     let texture
     if (
         image instanceof Image ||

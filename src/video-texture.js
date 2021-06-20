@@ -1,6 +1,5 @@
 import {Texture} from 'ogl'
-import Ticker from './ticker'
-const Emitter = require('tiny-emitter')
+import Emitter from 'tiny-emitter'
 
 export default class VideoTexture extends Texture {
     constructor(gl, options = {}) {

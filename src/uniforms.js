@@ -1,8 +1,5 @@
-import size from 'size'
-import stage from './stage'
-import Mouse from './mouse'
-import {Vec3} from 'ogl'
-import Ticker from './ticker'
+import { mouse } from './mouse'
+import { Vec3 } from 'ogl'
 
 class Uniforms {
     constructor() {
@@ -17,15 +14,15 @@ class Uniforms {
             useGUI: false,
         })
         this.add('mouse2d', {
-            value: Mouse.screenPosition,
+            value: mouse.screenPosition,
             useGUI: false,
         })
         this.add('mouse3d', {
-            value: Mouse.worldPosition,
+            value: mouse.worldPosition,
             useGUI: false,
         })
         this.add('resolution', {
-            value: new Vec3(size.width, size.height, size.width / size.height),
+            value: new Vec3(0, 0, 1),
             useGUI: false,
         })
         this.add('pixelRatio', {
@@ -33,21 +30,13 @@ class Uniforms {
         })
     }
 
-    init() {
-        this.update = this.update.bind(this)
-        this.resize = this.resize.bind(this)
-        Ticker.add(this.update)
-        size.addListener(this.resize)
-        this.resize()
-    }
-
-    resize() {
+    resize(width, height, dpr) {
         this.uniforms.resolution.value.set(
-            stage.renderer.width,
-            stage.renderer.height,
-            stage.renderer.width / stage.renderer.height
+            width,
+            height,
+            width / height
         )
-        this.uniforms.pixelRatio.value = stage.pixelRatio
+        this.uniforms.pixelRatio.value = dpr
     }
 
     add(name, object) {
@@ -91,4 +80,5 @@ class Uniforms {
     }
 }
 
-export default new Uniforms()
+export const uniforms = new Uniforms()
+export default uniforms
