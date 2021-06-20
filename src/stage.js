@@ -3,11 +3,13 @@ import Mouse from './mouse'
 import Uniforms from './uniforms'
 import Interaction from './interaction'
 import Screen from './screen'
-import TextureMaterial from './texture-material'
+import { Component } from './component'
+import TextureMaterial from './shaders/texture-material'
 import {Renderer, Camera, Transform, Mesh, Color, Raycast, Plane, Orbit} from 'ogl'
 import Ticker from './ticker'
+import { RenderScene } from '../^untitled:Untitled-2'
 
-class Stage extends Transform {
+class Stage extends Component {
     constructor() {
         super()
     }
@@ -20,24 +22,20 @@ class Stage extends Transform {
             left: 0,
             width: '100%',
             height: '100%',
-            zIndex: 1,
-            'pointer-events': 'none',
+            zIndex: 5,
         })
         this.resizeTarget = options.resizeTarget || null
+        this.pixelRatio = options.pixelRatio || window.devicePixelRatio || 1
 
-        this.pixelRatio = Math.min(
-            options.pixelRatio || window.devicePixelRatio || 1,
-            2
-        )
-        // this.pixelRatio = Math.max(this.pixelRatio, 1.25)
         this.renderer = new Renderer(
             Object.assign(
                 {
                     canvas: this.el,
-                    antialias: false,
-                    alpha: true,
+                    antialias: options.antialas,
+                    alpha: options.alpha || false,
                     dpr: this.pixelRatio,
-                    powerPreference: 'high-performance'
+                    powerPreference: options.powerPreference || 'high-performance',
+                    preserveDrawingBuffer: options.preserveDrawingBuffer || false,
                 },
                 options
             )
@@ -47,14 +45,7 @@ class Stage extends Transform {
         const gl = this.renderer.gl
         this.gl = gl
 
-        this.camera = new Camera(gl, {
-            fov: 45,
-            aspect: size.width / size.height,
-            near: 1,
-            far: 1000,
-        })
-        this.camera.position.z = 5
-
+        // Ortho scene for 2D/UI
         this.orthoScene = new Transform()
         this.orthoCamera = new Camera(gl, {
             left: -0.5,
@@ -66,17 +57,28 @@ class Stage extends Transform {
         })
         this.orthoCamera.position.z = 1
 
+        this.camera = new Camera(gl, {
+            fov: 45,
+            aspect: size.width / size.height,
+            near: 1,
+            far: 1000,
+        })
+        this.camera.position.z = 5
+        this.scene = new RenderScene({ renderToScreen: true })
+
         this.clearColor = new Color(options.clearColor || '#000000')
+
+        // init interaction
 
         Mouse.setCamera(this.camera)
         Mouse.bind()
         Uniforms.init()
 
-        // this.controls = new Orbit(this.camera)
-        
+        this.controls = new Orbit(this.camera, { enabled: false })
         this.raycaster = new Raycast(gl)
 
-        this.render = this.render.bind(this)
+        this.time = Date.now()
+        this.onUpdate = this.onUpdate.bind(this)
         this.onResize = this.onResize.bind(this)
         size.addListener(this.onResize)
         this.onResize()
@@ -91,20 +93,30 @@ class Stage extends Transform {
     }
 
     start() {
-        Ticker.add(this.render)        
+        Ticker.add(this.onUpdate)        
     }
 
     stop() {
-        Ticker.remove(this.render)
+        Ticker.remove(this.onUpdate)
+    }
+
+    onUpdate() {
+        let time = Date.now()
+        const dt = time - this.time
+
+        this.emit('tick', dt)
+        this.render()
+        this.time = time
+    }
+
+    toggleControls(state) {
+        this.orbit.enabled = state
     }
 
     render() {
-        // this.controls.update()
-
-        this.gl.clearColor(this.clearColor.r, this.clearColor.g, this.clearColor.b, 1)
-        // this.camera.lookAt([0, 0, 0])
+        if (this.controls.enabled) this.controls.update()
+        
         this.renderer.render({scene: this, camera: this.camera})
-
         this.renderOrtho()
     }
 
@@ -127,17 +139,15 @@ class Stage extends Transform {
         }
         this.renderer.setSize(resolution.width, resolution.height)
 
-        this.camera.aspect = resolution.width / resolution.height
-        this.camera.perspective()
-
         this.orthoCamera.orthographic({
             top: resolution.height * 0.5,
             bottom: -resolution.height * 0.5,
             left: -resolution.width * 0.5,
             right: resolution.width * 0.5,
-            near: -100,
-            far: 100
         })
+
+        this.camera.aspect = resolution.width / resolution.height
+        this.camera.perspective()
 
         if (this.debugs) {
             this.debugs.forEach(function(mesh, i) {
@@ -145,6 +155,10 @@ class Stage extends Transform {
                 mesh.position.y = -resolution.height * 0.5 + 50
             }, this)
         }
+
+        setTimeout(() => {
+            this.emit('resize')
+        })
     }
 
     raycast(camera, objects) {
@@ -155,6 +169,13 @@ class Stage extends Transform {
     interact(options) {
         this.interaction = this.interaction || new Interaction()
         this.interaction.add(options)
+    }
+
+    getDebugMesh(side = 10) {
+        // return new Mesh(
+        //     new BoxGeometry(side, side, side),
+        //     new MeshNormalMaterial()
+        // )
     }
 
     addDebug(texture) {
@@ -174,6 +195,12 @@ class Stage extends Transform {
         this.debugs.push(mesh)
         this.orthoScene.addChild(mesh)
     }
+
+    destroy() {
+        // TODO: renderer, scene
+        this.stop()
+        size.removeListener(this.onResize)
+    }
 }
 
-export default new Stage()
+export const stage = new Stage()

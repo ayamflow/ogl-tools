@@ -2,7 +2,7 @@
   "name": "ogl-tools",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,8 +10,8 @@
   "license": "MIT",
   "dependencies": {
     "ogl": "0.0.60",
-    "size": "git+https://github.com/ayamflow/size.git",
-    "sniffer": "git+https://github.com/ayamflow/sniffer.git",
+    "size": "github:ayamflow/size",
+    "sniffer": "git+https://github.com/ayamflow/ogl-tools.git",
     "tiny-emitter": "^2.1.0",
     "touches": "^1.2.2"
   }

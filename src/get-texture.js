@@ -1,7 +1,10 @@
-import assets from 'lib/assets'
-export const textureCache = {}
+import { stage } from './stage'
 import { Texture } from 'ogl'
-const THREE = {} // DEBUG
+
+export const textureCache = {}
+
+const pixel = new Image()
+pixel.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs='
 
 export default function(image, params = {}) {
     let texture
@@ -10,7 +13,9 @@ export default function(image, params = {}) {
         image instanceof HTMLVideoElement ||
         image instanceof HTMLCanvasElement
     ) {
-        texture = new Texture(image)
+        texture = new Texture(stage.gl, image)
+        setParams(texture, params)
+        return texture
     } else {
         // Cache
         let texture = textureCache[image]
@@ -28,12 +33,21 @@ export default function(image, params = {}) {
             texture.needsUpdate = needsUpdate
             return texture
         }
-        texture = new Texture(assets.get(image))
+        let img = new Image()
+            texture = new Texture(stage.gl, pixel)
+            textureCache[image] = texture
+            texture.needsUpdate = false
+            texture.promise = new Promise((resolve, reject) => {
+                img.onload = function() {
+                    img.onload = null
+                    texture.image = img
+                    setParams(texture, params)
+                    resolve(texture)
+                }
+            })
+            img.src = image
+            return texture
     }
-
-    setParams(texture, params)
-    texture.needsUpdate = true
-    return texture
 }
 
 function setParams(texture, params = {}) {
