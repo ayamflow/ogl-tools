@@ -8,7 +8,9 @@ export class RenderScene extends Transform {
         this.options = options
 
         if (!options.renderToScreen) {
-            this.initRT()
+            if (options.width && options.height) {
+                this.initRT(options.width, options.height)
+            }
         }
 
         this.camera = options.camera// || stage.camera
