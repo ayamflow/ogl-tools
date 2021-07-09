@@ -1,5 +1,5 @@
 import { stage } from './stage'
-import { Triangle } from 'ogl'
+import { Triangle, GLTFLoader } from 'ogl'
 
 const geometryCache = {}
 
@@ -25,14 +25,9 @@ export async function getGeometry(path, options = {}) {
     
             case 'glb':
             case 'gltf':
-                // loader = new GLTFLoader()
-                // console.log('getgeom', options);
-                // gltfpack compatibility
-                // if (options.decoder) loader.setMeshoptDecoder(options.decoder)
-                // loader.load(path, gltf => {
-                //     geometryCache[path] = gltf
-                //     resolve(gltf)
-                // })
+                loader = new GLTFLoader()
+                const gltf = await GLTFLoader.load(stage.gl, path)
+                resolve(gltf)
                 break
         }
     })
