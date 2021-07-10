@@ -12,9 +12,9 @@ export * as viewport from './viewport'
 // TODO !! // export { Shader } from './shader'
 
 // Materials
-// export { ColorMaterial } from './shaders/color-material'
-// export { DebugMaterial } from './shaders/debug-material'
-// export { TextureMaterial } from './shaders/texture-material'
+export { ColorMaterial } from './shaders/color-material'
+export { DebugMaterial } from './shaders/debug-material'
+export { TextureMaterial } from './shaders/texture-material'
 
 // Extras
 
