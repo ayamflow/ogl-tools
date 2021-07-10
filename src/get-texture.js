@@ -54,10 +54,10 @@ function setParams(texture, params = {}) {
     Object.assign(
         texture,
         {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.LinearFilter,
-            wrapS: THREE.ClampToEdgeWrapping,
-            wrapT: THREE.ClampToEdgeWrapping,
+            minFilter: stage.gl.LINEAR,
+            magFilter: stage.gl.LINEAR,
+            wrapS: stage.gl.CLAMP_TO_EDGE,
+            wrapT: stage.gl.CLAMP_TO_EDGE,
             generateMipmaps: false,
         },
         params
