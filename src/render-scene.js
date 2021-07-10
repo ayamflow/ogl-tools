@@ -7,21 +7,45 @@ export class RenderScene extends Transform {
         this.gl = gl
         this.options = options
 
+        this.camera = options.camera// || stage.camera
+        this.pixelRatio = options.pixelRatio || 1 //stage.pixelRatio
+
         if (!options.renderToScreen) {
-            if (options.width && options.height) {
-                this.initRT(options.width, options.height)
-            }
+            const width = options.width || 1
+            const height = options.height || 1
+            this.rt = new RenderTarget(gl, width, height, Object.assign({
+                minFilter: gl.LINEAR,
+                magFilter: gl.LINEAR,
+                format: gl.RGBA,
+                type: gl.UNSIGNED_BYTE,
+                depthBuffer: options.depthBuffer === true,
+                stencilBuffer: options.stencilBuffer === true,
+                depthTexture: options.useDepthTexture === true,
+            }, options))
         }
 
-        this.camera = options.camera// || stage.camera
-        this.pixelRatio = options.pixelRatio //stage.pixelRatio
-
-        // this.onResize = this.onResize.bind(this)
-        // size.addListener(this.onResize)
+        this.onResize = this.onResize.bind(this)
+        size.addListener(this.onResize)
     }
 
     onResize(width, height) {
-        this.initRT(width, height)
+        if (!this.rt) return
+
+        const w = width * this.pixelRatio
+        const h = height * this.pixelRatio
+        this.rt.width = w
+        this.rt.height = h
+        this.rt.textures.forEach(texture => {
+            texture.width = w
+            texture.height = h
+            texture.update()
+        })
+
+        if (this.rt.depthTexture) {
+            this.rt.depthTexture.width = w
+            this.rt.depthTexture.height = h
+            this.rt.depthTexture.update()
+        }
     }
 
     setSize(width, height) {
@@ -29,22 +53,20 @@ export class RenderScene extends Transform {
         this.onResize(width, height)
     }
 
-    initRT(width, height) {
-        this.rt = createRT(this.gl, width * this.pixelRatio, height * this.pixelRatio, this.options)
-    }
-
     render(rt) {
-        if (this.options.clearColor) {
+        const clearColor = this.options.clearColor || this.clearColor
+        const clearAlpha = this.options.clearAlpha || this.clearAlpha || 1
+        if (clearColor) {
             this.gl.clearColor(
-                this.options.clearColor.r,
-                this.options.clearColor.g,
-                this.options.clearColor.b,
-                this.options.clearAlpha || 1,
+                clearColor.r,
+                clearColor.g,
+                clearColor.b,
+                clearAlpha,
             )
         }
 
         this.gl.renderer.render({
-            scene: this.scene,
+            scene: this,
             camera: this.camera,
             target: rt || this.rt,
         })
@@ -62,16 +84,4 @@ export class RenderScene extends Transform {
     //     if (!this.rt) return
     //     stage.addDebug(this.rt.texture)
     // }
-}
-
-function createRT(gl, width, height, options = {}) {
-    return new RenderTarget(width, height, Object.assign({
-        minFilter: gl.LINEAR,
-        magFilter: gl.LINEAR,
-        format: gl.RGBA,
-        type: gl.UNSIGNED_BYTE,
-        depthBuffer: options.depthBuffer === true,
-        stencilBuffer: options.stencilBuffer === true,
-        depthTexture: options.useDepthTexture === true,
-    }, options))
 }
