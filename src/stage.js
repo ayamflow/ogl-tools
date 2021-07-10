@@ -61,7 +61,11 @@ class Stage extends Component {
             far: 1000,
         })
         this.camera.position.z = 5
-        this.scene = new RenderScene(this.gl, { renderToScreen: true })
+        this.scene = new RenderScene(this.gl, {
+            camera: this.camera,
+            pixelRatio: this.pixelRatio,
+            renderToScreen: true
+        })
 
         this.clearColor = new Color(options.clearColor || '#000000')
 
