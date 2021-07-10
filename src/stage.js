@@ -29,7 +29,7 @@ class Stage extends Component {
             Object.assign(
                 {
                     canvas: this.el,
-                    antialias: options.antialas,
+                    antialias: options.antialias,
                     alpha: options.alpha || false,
                     dpr: this.pixelRatio,
                     powerPreference: options.powerPreference || 'high-performance',
