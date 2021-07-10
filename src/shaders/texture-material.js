@@ -1,7 +1,7 @@
 import { Program } from 'ogl'
 
 export class TextureMaterial extends Program {
-    constructor(gl, options) {
+    constructor(gl, options = {}) {
         super(
             gl,
             Object.assign(
@@ -33,7 +33,7 @@ export class TextureMaterial extends Program {
             `,
                     uniforms: {
                         tMap: {
-                            value: options.map
+                            value: options.map || null
                         },
                         uAlpha: {
                             value: options.alpha || 1
@@ -48,5 +48,9 @@ export class TextureMaterial extends Program {
     
     set alpha(value) {
         this.uniforms.uAlpha.value = value
+    }
+    
+    set map(value) {
+        this.uniforms.tMap.value = value
     }
 }
