@@ -6,7 +6,7 @@ export { uniforms } from './uniforms'
 export { ticker } from './ticker'
 export { mouse } from './mouse'
 export { getGeometry } from './get-geometry'
-export { getTexture } from './get-texture'
+export { getTexture, addCustomParser } from './get-texture'
 export * as viewport from './viewport'
 
 // TODO !! // export { Shader } from './shader'

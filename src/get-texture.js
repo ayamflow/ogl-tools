@@ -2,11 +2,14 @@ import { stage } from './stage'
 import { Texture } from 'ogl'
 
 export const textureCache = {}
+const parsers = {}
 
 const pixel = new Image()
 pixel.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs='
 
-export function getTexture(image, params = {}) {
+const exts = ['jpg', 'jpeg', 'png']
+
+export async function getTexture(image, params = {}) {
     let texture
     if (
         image instanceof Image ||
@@ -23,7 +26,6 @@ export function getTexture(image, params = {}) {
             let needsUpdate = Object.keys(params).reduce(function(
                 reduce,
                 key,
-                i
             ) {
                 let value = params[key]
                 return reduce || value != texture[key]
@@ -33,21 +35,39 @@ export function getTexture(image, params = {}) {
             texture.needsUpdate = needsUpdate
             return texture
         }
-        let img = new Image()
-            texture = new Texture(stage.gl, pixel)
-            textureCache[image] = texture
-            texture.needsUpdate = false
-            texture.promise = new Promise((resolve, reject) => {
-                img.onload = function() {
-                    img.onload = null
-                    texture.image = img
-                    setParams(texture, params)
-                    resolve(texture)
-                }
-            })
-            img.src = image
-            return texture
+
+        const ext = image.split('.').pop()
+        if (exts.indexOf(ext) < 0) {
+            if (!parsers[ext]) {
+                throw new Error(`[getTexture] no parser for image extension .${ext}.`)
+            } else {
+                const texture = await parsers[ext](image)
+                textureCache[image] = texture
+                return texture
+            }
+        } else {
+            let img = new Image()
+                texture = new Texture(stage.gl, pixel)
+                textureCache[image] = texture
+                texture.needsUpdate = false
+                texture.promise = new Promise((resolve, reject) => {
+                    img.onload = function() {
+                        img.onload = null
+                        texture.image = img
+                        setParams(texture, params)
+                        resolve(texture)
+                    }
+                })
+                img.src = image
+                await texture.promise
+                return texture
+        }
     }
+}
+
+export function addCustomParser(exts, cb) {
+    const extensions = Array.isArray(exts) ? exts : [exts]
+    extensions.forEach(ext => parsers[ext] = cb)
 }
 
 function setParams(texture, params = {}) {
