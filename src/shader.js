@@ -1,115 +1,94 @@
-import Uniforms from './uniforms'
-// import Controlkit from 'controlkit'
-import sniffer from 'sniffer'
-const THREE = {} // DEBUG
+import { Program, Color } from 'ogl'
+import { Pane } from 'tweakpane'
 
-// const GLSLIFY_REGEX = /#import ([a-zA-Z0-9_-]+) from ([a-zA-Z0-9_-]+)/g
-// const GUI = new Controlkit().addPanel()
-// if (!sniffer.isDesktop || process.env.ENV != 'dev') GUI.disable()
-// GUI.disable()
+const GUI = new Pane({ expanded: false });
+GUI.element.parentNode.style.zIndex = 999
 
-export class Shader extends THREE.ShaderMaterial {
-    constructor(options = {}) {
+export class Shader extends Program {
+    constructor(gl, options = {}) {
         let useGUI = options.useGUI
         delete options.useGUI
 
-        super(
-            Object.assign(
-                {
-                    vertexShader:
-                        options.vertexShader || Shader.defaultVertexShader,
-                    fragmentShader:
-                        options.fragmentShader || Shader.defaultFragmentShader,
-                },
-                options
-            )
-        )
+        // const precision = options.precision || 'highp'
 
-        this.name =
-            options.name ||
-            this.constructor.name ||
-            this.constructor.toString().match(/function ([^\(]+)/)[1]
+        super(gl,  Object.assign({
+            vertex: options.vertex || Shader.defaultVertex,
+            fragment: options.fragment || Shader.defaultFragment,
+        }, options))
+
+        this.name = options.name
+            || this.constructor.name
+            || this.constructor.toString().match(/function ([^\(]+)/)[1]
+
         checkUniforms(this.name, options.uniforms)
 
         if (useGUI !== false) {
-            // console.log(`[Shader] ${this.name} addGUI`);
             this.addGUI(options)
         }
-
-        // TODO
-        // HMR?
     }
 
     addGUI(options) {
-        return
-
         // create panel and controls to GUI
-        let panel = GUI.addGroup({
-            label: this.name || this.uuid,
-            enable: false,
+        let folder = GUI.addFolder({
+            title: this.name || this.uuid,
+            expanded: false,
         })
 
         for (let uniform in this.uniforms) {
             let obj = this.uniforms[uniform]
             if (obj.useGUI === false) continue
-
             if (obj.value === null || obj.value === undefined) continue
+            if (obj.value.wrapS) continue // No texture support for now
 
-            if (obj.value.isVector2) {
-                // 2x number
-                panel
-                    .addSubGroup()
-                    .addNumberInput(obj.value, 'x', {
-                        label: uniform + ' x',
-                    })
-                    .addNumberInput(obj.value, 'y', {
-                        label: uniform + ' y',
-                    })
-            } else if (obj.value.isVector3) {
-                // 3x number
-                panel
-                    .addSubGroup()
-                    .addNumberInput(obj.value, 'x', {
-                        label: uniform + ' x',
-                    })
-                    .addNumberInput(obj.value, 'y', {
-                        label: uniform + ' y',
-                    })
-                    .addNumberInput(obj.value, 'z', {
-                        label: uniform + ' z',
-                    })
-            } else if (obj.value.isColor) {
-                // color
-                // a bit more logic to work with THREE.Color
-
-                let color = {
-                    value: [obj.value.r, obj.value.g, obj.value.b],
-                }
-                panel.addColor(color, 'value', {
+            if (typeof obj.value === 'number') {
+                folder.addInput(obj, 'value', {
                     label: uniform,
-                    colorMode: 'rgb',
-                    onChange: function() {
-                        obj.value.setRGB(
-                            color.value[0] / 256,
-                            color.value[1] / 256,
-                            color.value[2] / 256
-                        )
-                    },
-                })
-            } else if (obj.value === true || obj.value === false) {
-                // checkbox
-                panel.addCheckbox(obj, 'value', {
-                    label: uniform,
-                })
-            } else if (typeof obj.value == 'number') {
-                // number
-                panel.addNumberInput(obj, 'value', {
-                    label: uniform,
-                    dp: 5,
                     step: 0.001,
+                    min: obj.min || obj.value - 10,
+                    max: obj.max || obj.value + 10,
                 })
+            } else if (obj.value instanceof Color) {
+                let color = {
+                    value: {
+                        r: obj.value.r * 255,
+                        g: obj.value.g * 255,
+                        b: obj.value.b * 255,
+                    }
+                }
+                folder.addInput(color, 'value', { label: uniform })
+                    .on('change', () => {
+                        obj.value.set(
+                            color.value.r / 255,
+                            color.value.g / 255,
+                            color.value.b / 255,
+                        )
+                    })
+            } else {
+                folder.addInput(obj, 'value', { label: uniform })
             }
         }
+    }
+
+    /**
+     * Set an uniform's value
+     *
+     * @param {*} key
+     * @param {*} value
+     * @memberof Shader
+     */
+     set(key, value) {
+        this.uniforms[key].value = value.texture ? value.texture : value
+    }
+    
+    /**
+     * Return an uniform's value
+     *
+     * @param {*} key
+     * @return {*} 
+     * @memberof Shader
+     */
+    get(key) {
+        return this.uniforms[key].value
     }
 }
 
@@ -130,9 +109,12 @@ function checkUniforms(name, uniforms) {
 // }
 
 Object.assign(Shader, {
-    defaultVertexShader: `
-        attribute vec2 uv;
-        attribute vec3 position;
+    /**
+     * @memberof Shader
+     * @type {string}
+     * @static {string} Shader.defaultVertexShader
+     */
+    defaultVertex: `
         varying vec2 vUv;
 
         void main() {
@@ -140,13 +122,58 @@ Object.assign(Shader, {
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
     `,
-    defaultFragmentShader: `
-        precision highp float;
+    /**
+     * @memberof Shader
+     * @type {string}
+     * @static {string} Shader.quadVertexShader
+     */
+    quadVertex: `
+        varying vec2 vUv;
 
+        void main() {
+            vUv = uv;
+            gl_Position = vec4(position.xy, 0.0, 1.0);
+        }
+    `,
+    /**
+     * @memberof Shader
+     * @type {string}
+     * @static {string} Shader.defaultFragmentShader
+     */
+    defaultFragment: `
         varying vec2 vUv;
 
         void main() {
             gl_FragColor = vec4(vUv, 0.0, 1.0);
         }
     `,
+    /**
+     * @memberof Shader
+     * @type {string}
+     * @static {string} Shader.quadFragmentShader
+     */
+    quadFragment: `
+        uniform sampler2D tMap;
+        uniform float uAlpha;
+        varying vec2 vUv;
+
+        void main() {
+            gl_FragColor = texture2D(tMap, vUv);
+            gl_FragColor.a *= uAlpha;
+        }
+    `
 })
+
+// TBD
+function addPrecision(shader, precision) {
+    if (shader.includes('#version 300 es')) {
+        return `#version 300 es\nprecision ${precision} float;`
+        + shader.replace('#version 300 es', '')
+    }
+
+    return `precision ${precision} float;\n${shader}`
+}
+
+export function toggleGUI(value) {
+    GUI.expanded = value
+}
