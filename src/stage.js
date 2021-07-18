@@ -149,6 +149,8 @@ class Stage extends Component {
             left: -resolution.width * 0.5,
             right: resolution.width * 0.5,
         })
+        this.orthoCamera.position.x = resolution.width * 0.5
+        this.orthoCamera.position.y = -resolution.height * 0.5
 
         this.camera.aspect = resolution.width / resolution.height
         this.camera.perspective()
