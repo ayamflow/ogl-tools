@@ -8,7 +8,7 @@ export { mouse } from './mouse'
 export { getGeometry } from './get-geometry'
 export { getTexture, addCustomParser, textureCache } from './get-texture'
 export * as viewport from './viewport'
-export { Shader } from './shader'
+export { Shader, toggleGUI } from './shader'
 
 // Materials
 export { ColorMaterial } from './shaders/color-material'
