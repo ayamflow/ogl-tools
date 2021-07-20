@@ -3,11 +3,15 @@ import touches from 'touches'
 // import Velocity from 'lib/velocity-tracker'
 import { ticker } from './ticker'
 import {Vec2, Vec3} from 'ogl'
-const touch = touches(window, {filtered: true, preventSimulated: false})
+var touch
 // const velocity = new Velocity()
 
 class Mouse {
     constructor(options) {
+        if (!touch) {
+            touch = touches(window, {filtered: true, preventSimulated: false})
+        }
+        
         this.position = new Vec2(0, 0)
         this.screenPosition = new Vec3(2, 2, 0)
         this.screenDirection = new Vec2()

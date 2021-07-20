@@ -2,13 +2,17 @@ import { ticker } from './ticker'
 import touches from 'touches'
 import sniffer from 'sniffer'
 import Emitter from 'tiny-emitter'
-const touch = touches(window, {filtered: true, preventSimulated: false})
+var touch
 
 export class Interaction extends Emitter {
     constructor() {
         super()
         this.items = []
         this.last = null
+
+        if (!touch) {
+            touch = touches(window, {filtered: true, preventSimulated: false})
+        }
 
         this.addEvents()
     }
