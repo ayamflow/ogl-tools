@@ -12,6 +12,7 @@
     "sniffer": "github:ayamflow/sniffer",
     "tiny-emitter": "^2.1.0",
     "touches": "^1.2.2",
-    "tweakpane": "^3.0.3"
+    "tweakpane": "^3.0.3",
+    "tweakpane-image-plugin": "github:ayamflow/tweakpane-image-plugin"
   }
 }

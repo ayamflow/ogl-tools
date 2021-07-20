@@ -1,8 +1,10 @@
 import { Program, Color } from 'ogl'
 import { Pane } from 'tweakpane'
+import * as TweakpaneImagePlugin from 'tweakpane-image-plugin'
 
 const GUI = new Pane({ expanded: false });
 GUI.element.parentNode.style.zIndex = 999
+GUI.registerPlugin(TweakpaneImagePlugin);
 
 export class Shader extends Program {
     constructor(gl, options = {}) {
@@ -38,7 +40,6 @@ export class Shader extends Program {
             let obj = this.uniforms[uniform]
             if (obj.useGUI === false) continue
             if (obj.value === null || obj.value === undefined) continue
-            if (obj.value.wrapS) continue // No texture support for now
 
             if (typeof obj.value === 'number') {
                 folder.addInput(obj, 'value', {
@@ -63,7 +64,11 @@ export class Shader extends Program {
                             color.value.b / 255,
                         )
                     })
+            } else if (obj.value.image) {
+                folder.addInput(obj.value, 'image', { label: uniform })
             } else {
+                if (obj.value.wrapS) continue
+                
                 folder.addInput(obj, 'value', { label: uniform })
             }
         }
@@ -76,7 +81,7 @@ export class Shader extends Program {
      * @param {*} value
      * @memberof Shader
      */
-     set(key, value) {
+    set(key, value) {
         this.uniforms[key].value = value.texture ? value.texture : value
     }
     
