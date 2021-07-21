@@ -4,8 +4,7 @@ import { Texture } from 'ogl'
 export const textureCache = {}
 const parsers = {}
 
-const pixel = new Image()
-pixel.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs='
+var emptyImage
 
 const exts = ['jpg', 'jpeg', 'png']
 
@@ -47,20 +46,24 @@ export async function getTexture(image, params = {}) {
             }
         } else {
             let img = new Image()
-                texture = new Texture(stage.gl, pixel)
-                textureCache[image] = texture
-                texture.needsUpdate = false
-                texture.promise = new Promise((resolve, reject) => {
-                    img.onload = function() {
-                        img.onload = null
-                        texture.image = img
-                        setParams(texture, params)
-                        resolve(texture)
-                    }
-                })
-                img.src = image
-                await texture.promise
-                return texture
+            if (!emptyImage) {
+                emptyImage = new Image()
+                emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs='
+            }
+            texture = new Texture(stage.gl, emptyImage)
+            textureCache[image] = texture
+            texture.needsUpdate = false
+            texture.promise = new Promise((resolve, reject) => {
+                img.onload = function() {
+                    img.onload = null
+                    texture.image = img
+                    setParams(texture, params)
+                    resolve(texture)
+                }
+            })
+            img.src = image
+            await texture.promise
+            return texture
         }
     }
 }

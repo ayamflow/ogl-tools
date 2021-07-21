@@ -10,7 +10,7 @@ export class Interaction extends Emitter {
         this.items = []
         this.last = null
 
-        if (!touch) {
+        if (!touch && typeof window !== 'undefined') {
             touch = touches(window, {filtered: true, preventSimulated: false})
         }
 

@@ -8,10 +8,10 @@ var touch
 
 class Mouse {
     constructor(options) {
-        if (!touch) {
+        if (!touch && typeof window !== 'undefined') {
             touch = touches(window, {filtered: true, preventSimulated: false})
         }
-        
+
         this.position = new Vec2(0, 0)
         this.screenPosition = new Vec3(2, 2, 0)
         this.screenDirection = new Vec2()

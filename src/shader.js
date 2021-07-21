@@ -2,9 +2,12 @@ import { Program, Color } from 'ogl'
 import { Pane } from 'tweakpane'
 import * as TweakpaneImagePlugin from 'tweakpane-image-plugin'
 
-const GUI = new Pane({ expanded: false });
-GUI.element.parentNode.style.zIndex = 999
-GUI.registerPlugin(TweakpaneImagePlugin);
+var GUI
+if (typeof window !== 'undefined') {
+    GUI = new Pane({ expanded: false });
+    GUI.element.parentNode.style.zIndex = 999
+    GUI.registerPlugin(TweakpaneImagePlugin);
+}
 
 export class Shader extends Program {
     constructor(gl, options = {}) {
@@ -30,6 +33,8 @@ export class Shader extends Program {
     }
 
     addGUI(options) {
+        if (!GUI) return
+        
         // create panel and controls to GUI
         let folder = GUI.addFolder({
             title: this.name || this.uuid,
