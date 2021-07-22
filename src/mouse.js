@@ -7,11 +7,7 @@ var touch
 // const velocity = new Velocity()
 
 class Mouse {
-    constructor(options) {
-        if (!touch && typeof window !== 'undefined') {
-            touch = touches(window, {filtered: true, preventSimulated: false})
-        }
-
+    constructor() {
         this.position = new Vec2(0, 0)
         this.screenPosition = new Vec3(2, 2, 0)
         this.screenDirection = new Vec2()
@@ -33,6 +29,10 @@ class Mouse {
     }
 
     bind() {
+        if (!touch && typeof window !== 'undefined') {
+            touch = touches(window, {filtered: true, preventSimulated: false})
+        }
+
         touch.on('start', this.onStart)
         touch.on('move', this.onMove)
         touch.on('end', this.onEnd)
