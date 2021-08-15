@@ -13,7 +13,7 @@ export class RenderScene extends Transform {
         if (!options.renderToScreen) {
             const width = options.width || 1
             const height = options.height || 1
-            this.rt = new RenderTarget(gl, width, height, Object.assign({
+            this.rt = new RenderTarget(gl, width * this.pixelRatio, height * this.pixelRatio, Object.assign({
                 minFilter: gl.LINEAR,
                 magFilter: gl.LINEAR,
                 format: gl.RGBA,
@@ -31,21 +31,7 @@ export class RenderScene extends Transform {
     onResize(width, height) {
         if (!this.rt) return
 
-        const w = width * this.pixelRatio
-        const h = height * this.pixelRatio
-        this.rt.width = w
-        this.rt.height = h
-        this.rt.textures.forEach(texture => {
-            texture.width = w
-            texture.height = h
-            texture.update()
-        })
-
-        if (this.rt.depthTexture) {
-            this.rt.depthTexture.width = w
-            this.rt.depthTexture.height = h
-            this.rt.depthTexture.update()
-        }
+        this.rt.setSize(width * this.pixelRatio, height * this.pixelRatio)
     }
 
     setSize(width, height) {
