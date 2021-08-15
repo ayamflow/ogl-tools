@@ -8,6 +8,8 @@ import { Renderer, Camera, Transform, Mesh, Color, Raycast, Plane, Orbit } from 
 import { ticker } from './ticker'
 import { RenderScene } from './render-scene'
 
+const DEBUG_SIZE = 120
+
 class Stage extends Component {
     constructor() {
         super()
@@ -159,8 +161,8 @@ class Stage extends Component {
 
         if (this.debugs) {
             this.debugs.forEach(function(mesh, i) {
-                mesh.position.x = -resolution.width * 0.5 + 50 + 100 * i
-                mesh.position.y = -resolution.height * 0.5 + 50
+                mesh.position.x = DEBUG_SIZE * 0.5 + DEBUG_SIZE * i
+                mesh.position.y = -resolution.height + DEBUG_SIZE * 0.5
             }, this)
         }
 
@@ -187,19 +189,18 @@ class Stage extends Component {
     }
 
     addDebug(texture) {
-        const side = 120
         const gl = this.gl
         this.debugs = this.debugs || []
 
         let mesh = new Mesh(gl, {
             geometry: new Plane(gl, {
-                width: side,
-                height: side,
+                width: DEBUG_SIZE,
+                height: DEBUG_SIZE,
             }),
             program: new TextureMaterial(gl, {map: texture}),
         })
-        mesh.position.x = -size.width * 0.5 + side * 0.5 + side * this.debugs.length
-        mesh.position.y = -size.height * 0.5 + side * 0.5
+        mesh.position.x = DEBUG_SIZE * 0.5 + DEBUG_SIZE * this.debugs.length
+        mesh.position.y = -size.height + DEBUG_SIZE * 0.5
         this.debugs.push(mesh)
         this.orthoScene.addChild(mesh)
     }
