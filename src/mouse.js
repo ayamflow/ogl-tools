@@ -1,17 +1,16 @@
 import size from 'size'
 import touches from 'touches'
-// import Velocity from 'lib/velocity-tracker'
 import { ticker } from './ticker'
 import {Vec2, Vec3} from 'ogl'
 var touch
-// const velocity = new Velocity()
+var v2 = new Vec2()
 
 class Mouse {
     constructor() {
         this.position = new Vec2(0, 0)
         this.screenPosition = new Vec3(2, 2, 0)
         this.screenDirection = new Vec2()
-        // this.screenVelocity = new Vec2()
+        this.screenVelocity = new Vec2()
 
         this.worldPosition = new Vec3()
         this.worldDirection = new Vec3()
@@ -22,6 +21,8 @@ class Mouse {
         this.onMove = this.onMove.bind(this)
         this.onEnd = this.onEnd.bind(this)
         this.onUpdate = this.onUpdate.bind(this)
+
+        this.time = 0;
     }
 
     setCamera(camera) {
@@ -37,7 +38,8 @@ class Mouse {
         touch.on('move', this.onMove)
         touch.on('end', this.onEnd)
         ticker.add(this.onUpdate)
-        // velocity.start()
+
+        this.time = performance.now();
     }
     
     unbind() {
@@ -45,7 +47,6 @@ class Mouse {
         touch.off('move', this.onMove)
         touch.off('end', this.onEnd)
         ticker.remove(this.onUpdate)
-        // velocity.stop()
     }
 
     onStart(event, pos) {
@@ -54,12 +55,21 @@ class Mouse {
 
     onMove(event, pos) {
         // event.preventDefault()
-        // velocity.setPoint(pos[0], pos[1])
 
         this.position.x = pos[0]
         this.position.y = pos[1]
-        this.screenPosition.x = (pos[0] / size.width) * 2 - 1
-        this.screenPosition.y = -(pos[1] / size.height) * 2 + 1
+    }
+
+    onEnd(event, pos) {
+        this.onMove(event, pos)
+        this.isDown = false
+    }
+
+    onUpdate() {
+        v2.copy(this.screenPosition)
+        
+        this.screenPosition.x = (this.position.x / size.width) * 2 - 1
+        this.screenPosition.y = -(this.position.y / size.height) * 2 + 1
 
         this.worldPosition.set(
             this.screenPosition.x,
@@ -72,20 +82,12 @@ class Mouse {
         this.worldPosition.copy(
             this.camera.position.clone().add(direction.multiply(distance))
         )
-    }
 
-    onEnd(event, pos) {
-        this.onMove(event, pos)
-        this.isDown = false
+        const now = performance.now()
+        const time = now - this.time
+        this.screenVelocity.copy(this.screenPosition).sub(v2).divide(time).multiply(1000)
+        this.time = now
     }
-
-    onUpdate() {
-        // this.screenPosition.z = velocity.value / 100
-    }
-
-    // get velocity() {
-    //     return this.screenPosition.z
-    // }
 }
 
 export const mouse = new Mouse()
