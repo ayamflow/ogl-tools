@@ -125,7 +125,11 @@ Object.assign(Shader, {
      * @static {string} Shader.defaultVertexShader
      */
     defaultVertex: `
+        attribute vec2 uv;
+        attribute vec3 position;
         varying vec2 vUv;
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelViewMatrix;
 
         void main() {
             vUv = uv;
@@ -138,6 +142,8 @@ Object.assign(Shader, {
      * @static {string} Shader.quadVertexShader
      */
     quadVertex: `
+        attribute vec2 uv;
+        attribute vec3 position;
         varying vec2 vUv;
 
         void main() {
@@ -151,6 +157,8 @@ Object.assign(Shader, {
      * @static {string} Shader.defaultFragmentShader
      */
     defaultFragment: `
+        precision highp float;
+
         varying vec2 vUv;
 
         void main() {
@@ -163,6 +171,8 @@ Object.assign(Shader, {
      * @static {string} Shader.quadFragmentShader
      */
     quadFragment: `
+        precision highp float;
+
         uniform sampler2D tMap;
         uniform float uAlpha;
         varying vec2 vUv;
