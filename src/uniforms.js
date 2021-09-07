@@ -26,7 +26,8 @@ class Uniforms {
             useGUI: false,
         })
         this.add('pixelRatio', {
-            value: 1
+            value: 1,
+            useGUI: false,
         })
     }
 
