@@ -1,5 +1,5 @@
 import { stage } from './stage'
-import { Triangle, GLTFLoader } from 'ogl'
+import { Plane, Triangle, GLTFLoader } from 'ogl'
 
 const geometryCache = {}
 
@@ -35,4 +35,5 @@ export async function getGeometry(path, options = {}) {
 
 function initCommon() {
     geometryCache.quad = new Triangle(stage.gl)
+    geometryCache.plane = new Plane(stage.gl)
 }
