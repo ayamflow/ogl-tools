@@ -73,6 +73,7 @@ export class Shader extends Program {
                 folder.addInput(obj.value, 'image', { label: uniform })
             } else {
                 if (obj.value.wrapS) continue
+                if (obj.value.length) continue
                 
                 folder.addInput(obj, 'value', { label: uniform })
             }
