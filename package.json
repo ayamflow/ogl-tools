@@ -7,7 +7,7 @@
   "author": "Florian Morel",
   "license": "MIT",
   "peerDependencies": {
-    "ogl": "0.0.73",
+    "ogl": "^0.0.81",
     "size": "github:ayamflow/size",
     "sniffer": "github:ayamflow/sniffer",
     "tiny-emitter": "^2.1.0",
