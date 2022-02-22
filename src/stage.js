@@ -130,6 +130,7 @@ class Stage extends Component {
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT)
         this.renderer.render({scene: this.orthoScene, camera: this.orthoCamera})
         this.renderer.autoClear = clear
+        this.emit('ortho')
     }
 
     onResize() {
