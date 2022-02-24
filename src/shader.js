@@ -131,6 +131,7 @@ Object.assign(Shader, {
      * @static {string} Shader.defaultVertexShader
      */
     defaultVertex: /* glsl */`
+        precision ${precision} float;
         attribute vec2 uv;
         attribute vec3 position;
         varying vec2 vUv;
@@ -148,6 +149,7 @@ Object.assign(Shader, {
      * @static {string} Shader.quadVertexShader
      */
     quadVertex: /* glsl */`
+        precision ${precision} float;
         attribute vec2 uv;
         attribute vec3 position;
         varying vec2 vUv;
