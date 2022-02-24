@@ -6,7 +6,7 @@ export class ColorMaterial extends Program {
             gl,
             Object.assign(
                 {
-                    vertex: `
+                    vertex: /* glsl */`
                 attribute vec3 position;
                 attribute vec2 uv;
                 varying vec2 vUv;
@@ -19,7 +19,7 @@ export class ColorMaterial extends Program {
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
             `,
-                    fragment: `
+                    fragment: /* glsl */`
                 precision highp float;
 
                 uniform vec3 uColor;

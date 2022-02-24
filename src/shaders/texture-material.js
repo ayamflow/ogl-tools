@@ -6,7 +6,7 @@ export class TextureMaterial extends Program {
             gl,
             Object.assign(
                 {
-                    vertex: `
+                    vertex: /* glsl */`
                 attribute vec3 position;
                 attribute vec2 uv;
                 varying vec2 vUv;
@@ -19,8 +19,8 @@ export class TextureMaterial extends Program {
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
             `,
-                    fragment: `
-                precision highp float;
+                    fragment: /* glsl */`
+                precision mediump float;
 
                 uniform sampler2D tMap;
                 uniform float uAlpha;

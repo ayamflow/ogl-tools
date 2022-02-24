@@ -6,7 +6,7 @@ export class DebugMaterial extends Program {
             gl,
             Object.assign(
                 {
-                    vertex: `
+                    vertex: /* glsl */`
                 attribute vec3 position;
                 attribute vec3 normal;
                 varying vec3 vNormal;
@@ -19,8 +19,8 @@ export class DebugMaterial extends Program {
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
             `,
-                    fragment: `
-                precision highp float;
+                    fragment: /* glsl */`
+                precision mediump float;
                 varying vec3 vNormal;
 
                 void main() {

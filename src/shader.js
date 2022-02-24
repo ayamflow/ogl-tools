@@ -9,12 +9,17 @@ if (typeof window !== 'undefined') {
     GUI.registerPlugin(TweakpaneImagePlugin);
 }
 
+var precision = 'mediump'
+export function setPrecision(value) {
+    precision = value
+}
+
 export class Shader extends Program {
     constructor(gl, options = {}) {
         let useGUI = options.useGUI
         delete options.useGUI
 
-        // const precision = options.precision || 'highp'
+        // const precision = options.precision || 'mediump'
 
         super(gl,  Object.assign({
             vertex: options.vertex || Shader.defaultVertex,
@@ -125,7 +130,7 @@ Object.assign(Shader, {
      * @type {string}
      * @static {string} Shader.defaultVertexShader
      */
-    defaultVertex: `
+    defaultVertex: /* glsl */`
         attribute vec2 uv;
         attribute vec3 position;
         varying vec2 vUv;
@@ -142,7 +147,7 @@ Object.assign(Shader, {
      * @type {string}
      * @static {string} Shader.quadVertexShader
      */
-    quadVertex: `
+    quadVertex: /* glsl */`
         attribute vec2 uv;
         attribute vec3 position;
         varying vec2 vUv;
@@ -157,8 +162,8 @@ Object.assign(Shader, {
      * @type {string}
      * @static {string} Shader.defaultFragmentShader
      */
-    defaultFragment: `
-        precision highp float;
+    defaultFragment: /* glsl */`
+        precision ${precision} float;
 
         varying vec2 vUv;
 
@@ -171,8 +176,8 @@ Object.assign(Shader, {
      * @type {string}
      * @static {string} Shader.quadFragmentShader
      */
-    quadFragment: `
-        precision highp float;
+    quadFragment: /* glsl */`
+        precision ${precision} float;
 
         uniform sampler2D tMap;
         uniform float uAlpha;
